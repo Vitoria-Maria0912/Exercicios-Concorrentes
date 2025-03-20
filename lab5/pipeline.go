@@ -38,13 +38,17 @@ func producer(ch chan int, length int) {
 	for { go RandString(length) }
 }
 
-func consumer(ch chan int, s string) {
-	if isLetter(s) { fmt.Println(s) }
+func consumer(ch chan int) {
+	for str := range ch {
+		if isLetter(str) { fmt.Printf("Only letters: %s\n", str) }
+	}
 }
 
 func main() {
 
-	ch := make(chan int)
+	ch := make(chan string)
 	producer(ch, 5)
-	consumer(ch, "x")
+	consumer(ch)
+
+	select{}
 }
