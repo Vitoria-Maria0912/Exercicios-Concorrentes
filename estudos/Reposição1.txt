@@ -1,0 +1,78 @@
+Aluno: Vitória Maria Do Nascimento
+Matrícula: 121210254
+---------------------------------------------------------------------------------------
+Questão 1:
+
+int exec(int[] V, int n){
+    mutex = Sem(1)
+    barrier = new Barrier(n + 1)
+    max_vetor = ArrayList<>
+    global_max = 0
+    start_index = 0
+
+    for(i = 0; i < n; i++){
+        create_thread(vetor_max, V)
+        // decrementa o contador
+        barrier.wait()
+    }
+
+    // espera todas as threads, inclusive a mãe
+    barrier.wait()
+
+    for(max in max_vetor){
+        if(max > max_global) { max_global = max }
+    }
+
+    return max_global;
+}
+
+Barrier(n){
+    mutex = Sem(1)
+    count = 0
+    cat1 = Sem(0)
+    cat2 = Sem(1)
+
+    wait(){
+        // fase 1
+        mutex.wait()
+            count ++
+            if (count == n) {
+                cat2.wait()
+                cat1.signal()
+            }
+        mutex.signal()
+        cat1.wait()
+        cat1.signal()
+
+        // fase 2
+        mutex.wait()
+            count --
+            if (count == 0) {
+                cat1.wait()
+                cat2.signal()
+            }
+        mutex.signal()
+        cat2.wait()
+        cat2.signal()
+    }
+}
+
+void vetor_max(int[] V){
+    end_index = start_index + ( V.lenght % n )
+    if(end_index > V.lenght) { end_index = V.lenght }
+    max_slice = find_max_slice(V, start_index, end_index)
+    mutex.wait()
+    max_vetor.add(max_slice)
+    start_index = end_index + 1
+    mutex.signal()
+}
+
+int find_max_slice(int[] V, int start_index, int end_index){
+    max = 0
+    for(i = 0; i < V.lenght; i++){
+        if(i >= start_index and i <= end_index){
+            max = Math.max(max, V[i])
+        }
+    }
+    return max;
+}
